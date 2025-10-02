@@ -1,9 +1,6 @@
-import pandas as pd
+from download import Kaggle
 from pathlib import Path
 
-caminho_do_dataframe = Path().cwd() / 'fase_1' / 'data' / 'diabetes.csv'
-dados = pd.read_csv(str(caminho_do_dataframe))
-
-print(dados.shape)
-dados.info()
-
+origem = 'mathchi/diabetes-data-set'
+destino = Path().cwd().parent / 'data'
+Kaggle.download(origem, str(destino))
