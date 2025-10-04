@@ -1,6 +1,6 @@
-def explorar(dados):
+def mostrar_informacoes_relevantes(dados):
     """
-    Mostra informações relevantes para a tomada de decisões sobre como tratar dados usados no treinamento de uma IA
+    Exibe detalhes importantes sobre os dados para a tomada de decisões sobre como trata-los para o treinamento de uma IA
     
     Args:
         dados (DadaFrame): conjunto de informações que será avaliado.
