@@ -8,19 +8,19 @@ def mostrar_informacoes_relevantes(dados):
         dados (DataFrame): retorna os mesmos dados recebidos por parâmetro
     """
 
-    print('Quantidade de linhas e colunas dos dados:')
+    print('Quantidade de linhas e colunas:')
     print(dados.shape)
     print('\n')
     
-    print('Informações sobre a estrutura dos dados:')
+    print('Informações sobre a estrutura:')
     print(dados.info())
     print('\n')
     
-    print('Estatísticas básicas sobre o conteúdo dos dados:')
+    print('Estatísticas básicas sobre o conteúdo:')
     print(dados.describe())
     print('\n')
 
-    print('Primeiros registros dos dados:')
+    print('Primeiros registros:')
     print(dados.head())
 
     return dados
