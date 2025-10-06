@@ -3,7 +3,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
-def analisar_estatisticas_descritivas(dados, target):
+def analisar_estatisticas_descritivas(dados, alvo):
+
+    # ----------------------------
+    # Cópia dos dados, porém sem a coluna "alvo"
+    # ----------------------------
+    dados_sem_alvo = dados.drop(columns=[alvo])
 
     # ----------------------------
     # Estatísticas descritivas
@@ -19,16 +24,16 @@ def analisar_estatisticas_descritivas(dados, target):
     print('\nResumo estatístico:')
     print(dados.describe())
 
-    print(f'\nContagem de valores por classe em {target}:')
-    print(dados[target].value_counts())
+    print(f'\nContagem de valores por classe em {alvo}:')
+    print(dados[alvo].value_counts())
 
     # ----------------------------
     # Visualização da variável alvo
     # ----------------------------
     plt.figure(figsize=(6,4))
-    sns.countplot(x=target, data=dados, palette='Set2', hue=target, legend=False)
-    plt.title(f'Distribuição da variável alvo ({target})')
-    plt.xlabel(f'{target} (0 = Não, 1 = Sim)')
+    sns.countplot(x=alvo, data=dados, palette='Set2', hue=alvo, legend=False)
+    plt.title(f'Distribuição da variável alvo ({alvo})')
+    plt.xlabel(f'{alvo} (0 = Não, 1 = Sim)')
     plt.ylabel('Contagem')
     plt.show()
 
@@ -40,16 +45,26 @@ def analisar_estatisticas_descritivas(dados, target):
     plt.show()
 
     # ----------------------------
-    # Boxplots das variáveis numéricas
+    # Boxplots das variáveis numéricas, comparando-as com o alvo
     # ----------------------------
     plt.figure(figsize=(14,10))
-    dados_sem_target = dados.drop(columns=[target])
-    for i, coluna in enumerate(dados_sem_target.columns):
+    for i, coluna in enumerate(dados_sem_alvo.columns):
         plt.subplot(3, 3, i+1)
-        sns.boxplot(y=coluna, x=target, data=dados, palette='Set2', hue=target, legend=False)
-        plt.title(f'{coluna} vs {target}')
+        sns.boxplot(y=coluna, x=alvo, data=dados, palette='Set2', hue=alvo, legend=False)
+        plt.title(f'{coluna} vs {alvo}')
     plt.tight_layout()
     plt.show()
+
+    # ----------------------------
+    # KDE (distribuição por classe)
+    # ----------------------------
+    plt.figure(figsize=(14,10))
+    for i, coluna in enumerate(dados_sem_alvo.columns):
+        plt.subplot(3, 3, i+1)
+        sns.kdeplot(data=dados, x=coluna, hue=alvo, fill=True, common_norm=False, alpha=0.5, palette="Set2")
+        plt.title(f'Distribuição de {coluna} por {alvo}')
+    plt.tight_layout()
+    plt.show()    
 
     # ----------------------------
     # Correlação entre variáveis
@@ -63,24 +78,23 @@ def analisar_estatisticas_descritivas(dados, target):
     # Testes estatísticos
     # ----------------------------
     print("\n===== Testes Estatísticos =====")
-    grupo0 = dados[dados[target] == 0]
-    grupo1 = dados[dados[target] == 1]
+    grupo0 = dados[dados[alvo] == 0]
+    grupo1 = dados[dados[alvo] == 1]
 
-    dados_sem_target = dados.drop(columns=[target])
-    for col in dados_sem_target.columns:
-        print(f"\n--- {col} ---")
+    for coluna in dados_sem_alvo.columns:
+        print(f"\n--- {coluna} ---")
         
         # Teste de normalidade (Shapiro-Wilk)
-        stat0, p0 = shapiro(grupo0[col])
-        stat1, p1 = shapiro(grupo1[col])
+        stat0, p0 = shapiro(grupo0[coluna])
+        stat1, p1 = shapiro(grupo1[coluna])
         
         if p0 > 0.05 and p1 > 0.05:
             # Se ambas distribuições são normais -> teste t
-            stat, p = ttest_ind(grupo0[col], grupo1[col])
+            stat, p = ttest_ind(grupo0[coluna], grupo1[coluna])
             teste = "t de Student (paramétrico)"
         else:
             # Se não são normais -> Mann-Whitney
-            stat, p = mannwhitneyu(grupo0[col], grupo1[col])
+            stat, p = mannwhitneyu(grupo0[coluna], grupo1[coluna])
             teste = "Mann-Whitney U (não-paramétrico)"
         
         print(f"Teste: {teste}")
