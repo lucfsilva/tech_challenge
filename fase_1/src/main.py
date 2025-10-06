@@ -12,4 +12,4 @@ if not any(destino.iterdir()):
 
 dados = pd.read_csv(destino / 'diabetes.csv')
 
-exploracao.analisar_estatisticas_descritivas(dados, 'Outcome')
+exploracao.analisar_dados(dados, 'Outcome')

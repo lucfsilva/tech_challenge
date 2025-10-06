@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
-def analisar_estatisticas_descritivas(dados, alvo):
+def analisar_dados(dados, alvo):
 
     # ----------------------------
     # Cópia dos dados, porém sem a coluna "alvo"
