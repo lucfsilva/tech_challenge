@@ -3,14 +3,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
-def analisar_dados(dados, alvo):
+def analisar_dados(dados, coluna_alvo):
+    """
+    Mostra informações relevantes sobre os dados para que se possa tomar decisões 
+    quanto a limpeza deles antes de usá-los no treinamento de uma IA.
 
+    Args:
+        dados (DataFrame): tabela com informações que serão analisadas.
+        coluna_alvo (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
+            Exemplo: na análise de dados médicos, a coluna_alvo pode ser aquela que mostra um diagnóstico como positivo ou negativo.
+    """
     print('Iniciando análise dos dados')
 
     # ----------------------------
-    # Cópia dos dados, porém sem a coluna "alvo"
+    # Cópia dos dados, porém sem a coluna_alvo
     # ----------------------------
-    dados_sem_alvo = dados.drop(columns=[alvo])
+    dados_sem_coluna_alvo = dados.drop(columns=[coluna_alvo])
 
     # ----------------------------
     # Estatísticas descritivas
@@ -26,16 +34,16 @@ def analisar_dados(dados, alvo):
     print('\nResumo estatístico:')
     print(dados.describe())
 
-    print(f'\nContagem de valores por classe em {alvo}:')
-    print(dados[alvo].value_counts())
+    print(f'\nContagem de valores por classe em {coluna_alvo}:')
+    print(dados[coluna_alvo].value_counts())
 
     # ----------------------------
-    # Visualização da variável alvo
+    # Visualização da variável coluna_alvo
     # ----------------------------
     plt.figure(figsize=(6,4))
-    sns.countplot(x=alvo, data=dados, palette='Set2', hue=alvo, legend=False)
-    plt.title(f'Distribuição da variável alvo ({alvo})')
-    plt.xlabel(f'{alvo} (0 = Não, 1 = Sim)')
+    sns.countplot(x=coluna_alvo, data=dados, palette='Set2', hue=coluna_alvo, legend=False)
+    plt.title(f'Distribuição da variável coluna_alvo ({coluna_alvo})')
+    plt.xlabel(f'{coluna_alvo} (0 = Não, 1 = Sim)')
     plt.ylabel('Contagem')
     plt.show()
 
@@ -47,13 +55,13 @@ def analisar_dados(dados, alvo):
     plt.show()
 
     # ----------------------------
-    # Boxplots das variáveis numéricas, comparando-as com o alvo
+    # Boxplots das variáveis numéricas, comparando-as com o coluna_alvo
     # ----------------------------
     plt.figure(figsize=(14,10))
-    for i, coluna in enumerate(dados_sem_alvo.columns):
+    for i, coluna in enumerate(dados_sem_coluna_alvo.columns):
         plt.subplot(3, 3, i+1)
-        sns.boxplot(y=coluna, x=alvo, data=dados, palette='Set2', hue=alvo, legend=False)
-        plt.title(f'{coluna} vs {alvo}')
+        sns.boxplot(y=coluna, x=coluna_alvo, data=dados, palette='Set2', hue=coluna_alvo, legend=False)
+        plt.title(f'{coluna} vs {coluna_alvo}')
     plt.tight_layout()
     plt.show()
 
@@ -61,10 +69,10 @@ def analisar_dados(dados, alvo):
     # KDE (distribuição por classe)
     # ----------------------------
     plt.figure(figsize=(14,10))
-    for i, coluna in enumerate(dados_sem_alvo.columns):
+    for i, coluna in enumerate(dados_sem_coluna_alvo.columns):
         plt.subplot(3, 3, i+1)
-        sns.kdeplot(data=dados, x=coluna, hue=alvo, fill=True, common_norm=False, alpha=0.5, palette="Set2")
-        plt.title(f'Distribuição de {coluna} por {alvo}')
+        sns.kdeplot(data=dados, x=coluna, hue=coluna_alvo, fill=True, common_norm=False, alpha=0.5, palette="Set2")
+        plt.title(f'Distribuição de {coluna} por {coluna_alvo}')
     plt.tight_layout()
     plt.show()    
 
@@ -80,10 +88,10 @@ def analisar_dados(dados, alvo):
     # Testes estatísticos
     # ----------------------------
     print("\n===== Testes Estatísticos =====")
-    grupo0 = dados[dados[alvo] == 0]
-    grupo1 = dados[dados[alvo] == 1]
+    grupo0 = dados[dados[coluna_alvo] == 0]
+    grupo1 = dados[dados[coluna_alvo] == 1]
 
-    for coluna in dados_sem_alvo.columns:
+    for coluna in dados_sem_coluna_alvo.columns:
         print(f"\n--- {coluna} ---")
         
         # Teste de normalidade (Shapiro-Wilk)
