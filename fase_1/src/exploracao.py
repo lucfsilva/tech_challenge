@@ -5,6 +5,8 @@ from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
 def analisar_dados(dados, alvo):
 
+    print('Iniciando análise dos dados')
+
     # ----------------------------
     # Cópia dos dados, porém sem a coluna "alvo"
     # ----------------------------
@@ -13,7 +15,7 @@ def analisar_dados(dados, alvo):
     # ----------------------------
     # Estatísticas descritivas
     # ----------------------------
-    print('Dimensão do dataset:', dados.shape)
+    print('\nDimensão do dataset:', dados.shape)
 
     print('\nEstrutura do dataset:')
     print(dados.info())
@@ -103,3 +105,5 @@ def analisar_dados(dados, alvo):
             print("👉 Diferença significativa entre os grupos")
         else:
             print("👉 Não há diferença significativa")    
+
+    print('\nFinalizando análise dos dados')
