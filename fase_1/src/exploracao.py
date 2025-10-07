@@ -9,10 +9,11 @@ def analisar_dados(dados, coluna_target):
     quanto a limpeza deles antes de usá-los no treinamento de uma IA.
 
     Parâmetros:
-        dados (DataFrame): tabela com informações que serão analisadas.
-        coluna_target (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
+        dados: conjunto de informações que devem ser analisadas.
+        coluna_target (str): nome da coluna que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
             Exemplo: na análise de dados médicos, a coluna_target pode ser aquela que mostra um diagnóstico como positivo ou negativo.
     '''
+
     print('Iniciando análise dos dados')
 
     # ----------------------------
@@ -79,10 +80,10 @@ def analisar_dados(dados, coluna_target):
     # ----------------------------
     # Correlação entre variáveis
     # ----------------------------
-    plt.figure(figsize=(10,8))
-    sns.heatmap(dados.corr(), annot=True, cmap='coolwarm', fmt='.2f')
-    plt.title('Matriz de Correlação')
-    plt.show()
+    # plt.figure(figsize=(10,8))
+    # sns.heatmap(dados.corr(), annot=True, cmap='coolwarm', fmt='.2f')
+    # plt.title('Matriz de Correlação')
+    # plt.show()
 
     # ----------------------------
     # Testes estatísticos
@@ -115,3 +116,43 @@ def analisar_dados(dados, coluna_target):
             print("👉 Não há diferença significativa")    
 
     print('\nFinalizando análise dos dados')
+
+def analisar_correlacao(dados, coluna_target, sufixo_outlier, metodo_correlacao='pearson'):
+    '''
+    Verifica a correção entre a coluna_target e as demais colunas, descartando as colunas cujo nome termina em sufixo_outlier
+
+    Parâmetros:
+        dados (DataFrame): tabela com informações que serão analisadas.
+        coluna_target (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
+            Exemplo: na análise de dados médicos, a coluna_target pode ser aquela que mostra um diagnóstico como positivo ou negativo.
+    '''
+
+
+    colunas_originais = [coluna for coluna in dados.columns if not coluna.endswith(sufixo_outlier)]
+    dados_correlacao = dados[colunas_originais]
+
+    # ----------------------------
+    # Calcular matriz de correlação
+    # ----------------------------
+    corr_matrix = dados_correlacao.corr(method=metodo_correlacao)
+
+    print("Matriz de correlação:")
+    print(corr_matrix)
+
+    # ----------------------------
+    # Mapa de calor da matriz de correlação
+    # ----------------------------
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", cbar=True)
+    plt.title("Mapa de Calor da Matriz de Correlação")
+    plt.show()
+
+    # ----------------------------
+    # Ranking das variáveis mais correlacionadas com Outcome
+    # ----------------------------
+    corr_with_target = corr_matrix[coluna_target].drop(coluna_target)
+    ranking = corr_with_target.abs().sort_values(ascending=False)
+
+    print("\nRanking das variáveis mais correlacionadas com Outcome:")
+    print(ranking)
+    
