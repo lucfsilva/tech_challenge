@@ -3,22 +3,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
-def analisar_dados(dados, coluna_alvo):
+def analisar_dados(dados, coluna_target):
     """
     Mostra informações relevantes sobre os dados para que se possa tomar decisões 
     quanto a limpeza deles antes de usá-los no treinamento de uma IA.
 
     Args:
         dados (DataFrame): tabela com informações que serão analisadas.
-        coluna_alvo (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
-            Exemplo: na análise de dados médicos, a coluna_alvo pode ser aquela que mostra um diagnóstico como positivo ou negativo.
+        coluna_target (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
+            Exemplo: na análise de dados médicos, a coluna_target pode ser aquela que mostra um diagnóstico como positivo ou negativo.
     """
     print('Iniciando análise dos dados')
 
     # ----------------------------
-    # Cópia dos dados, porém sem a coluna_alvo
+    # Cópia dos dados, porém sem a coluna_target
     # ----------------------------
-    dados_sem_coluna_alvo = dados.drop(columns=[coluna_alvo])
+    dados_sem_coluna_target = dados.drop(columns=[coluna_target])
 
     # ----------------------------
     # Estatísticas descritivas
@@ -34,16 +34,16 @@ def analisar_dados(dados, coluna_alvo):
     print('\nResumo estatístico:')
     print(dados.describe())
 
-    print(f'\nContagem de valores por classe em {coluna_alvo}:')
-    print(dados[coluna_alvo].value_counts())
+    print(f'\nContagem de valores por classe em {coluna_target}:')
+    print(dados[coluna_target].value_counts())
 
     # ----------------------------
-    # Visualização da variável coluna_alvo
+    # Visualização da variável coluna_target
     # ----------------------------
     plt.figure(figsize=(6,4))
-    sns.countplot(x=coluna_alvo, data=dados, palette='Set2', hue=coluna_alvo, legend=False)
-    plt.title(f'Distribuição da variável coluna_alvo ({coluna_alvo})')
-    plt.xlabel(f'{coluna_alvo} (0 = Não, 1 = Sim)')
+    sns.countplot(x=coluna_target, data=dados, palette='Set2', hue=coluna_target, legend=False)
+    plt.title(f'Distribuição da variável coluna_target ({coluna_target})')
+    plt.xlabel(f'{coluna_target} (0 = Não, 1 = Sim)')
     plt.ylabel('Contagem')
     plt.show()
 
@@ -55,13 +55,13 @@ def analisar_dados(dados, coluna_alvo):
     plt.show()
 
     # ----------------------------
-    # Boxplots das variáveis numéricas, comparando-as com o coluna_alvo
+    # Boxplots das variáveis numéricas, comparando-as com o coluna_target
     # ----------------------------
     plt.figure(figsize=(14,10))
-    for i, coluna in enumerate(dados_sem_coluna_alvo.columns):
+    for i, coluna in enumerate(dados_sem_coluna_target.columns):
         plt.subplot(3, 3, i+1)
-        sns.boxplot(y=coluna, x=coluna_alvo, data=dados, palette='Set2', hue=coluna_alvo, legend=False)
-        plt.title(f'{coluna} vs {coluna_alvo}')
+        sns.boxplot(y=coluna, x=coluna_target, data=dados, palette='Set2', hue=coluna_target, legend=False)
+        plt.title(f'{coluna} vs {coluna_target}')
     plt.tight_layout()
     plt.show()
 
@@ -69,10 +69,10 @@ def analisar_dados(dados, coluna_alvo):
     # KDE (distribuição por classe)
     # ----------------------------
     plt.figure(figsize=(14,10))
-    for i, coluna in enumerate(dados_sem_coluna_alvo.columns):
+    for i, coluna in enumerate(dados_sem_coluna_target.columns):
         plt.subplot(3, 3, i+1)
-        sns.kdeplot(data=dados, x=coluna, hue=coluna_alvo, fill=True, common_norm=False, alpha=0.5, palette="Set2")
-        plt.title(f'Distribuição de {coluna} por {coluna_alvo}')
+        sns.kdeplot(data=dados, x=coluna, hue=coluna_target, fill=True, common_norm=False, alpha=0.5, palette="Set2")
+        plt.title(f'Distribuição de {coluna} por {coluna_target}')
     plt.tight_layout()
     plt.show()    
 
@@ -88,10 +88,10 @@ def analisar_dados(dados, coluna_alvo):
     # Testes estatísticos
     # ----------------------------
     print("\n===== Testes Estatísticos =====")
-    grupo0 = dados[dados[coluna_alvo] == 0]
-    grupo1 = dados[dados[coluna_alvo] == 1]
+    grupo0 = dados[dados[coluna_target] == 0]
+    grupo1 = dados[dados[coluna_target] == 1]
 
-    for coluna in dados_sem_coluna_alvo.columns:
+    for coluna in dados_sem_coluna_target.columns:
         print(f"\n--- {coluna} ---")
         
         # Teste de normalidade (Shapiro-Wilk)
