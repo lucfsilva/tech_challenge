@@ -15,3 +15,6 @@ dados = pd.read_csv(destino / 'diabetes.csv')
 
 exploracao.analisar_dados(dados, 'Outcome')
 dados = limpeza.limpar_dados(dados, ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age'])
+
+# incluir balanceamento dos dados
+# incluir normalização e padronização

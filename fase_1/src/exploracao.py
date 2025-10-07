@@ -4,15 +4,15 @@ import seaborn as sns
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
 def analisar_dados(dados, coluna_target):
-    """
+    '''
     Mostra informações relevantes sobre os dados para que se possa tomar decisões 
     quanto a limpeza deles antes de usá-los no treinamento de uma IA.
 
-    Args:
+    Parâmetros:
         dados (DataFrame): tabela com informações que serão analisadas.
         coluna_target (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
             Exemplo: na análise de dados médicos, a coluna_target pode ser aquela que mostra um diagnóstico como positivo ou negativo.
-    """
+    '''
     print('Iniciando análise dos dados')
 
     # ----------------------------
