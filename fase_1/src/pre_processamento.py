@@ -61,9 +61,9 @@ def tratar_outliers(dados, limite_skew=0.5, limite_zscore=3):
 
     return dados, sufixo_outlier
 
-def escalonar(escalonador, X_treino, X_teste):
+def tratar_escala(scaler, X_treino, X_teste):
     '''
-    Escalona o conteúdo das colunas
+    Ajusta os dados para a escala de cada coluna
 
     Parâmetros:
         scaler: escalonador que será usado
@@ -77,8 +77,8 @@ def escalonar(escalonador, X_treino, X_teste):
 
     print('\nIniciando o escalonamento')
     
-    X_treino_escalonado = escalonador.fit_transform(X_treino)
-    X_teste_escalonado = escalonador.transform(X_teste)
+    X_treino_escalonado = scaler.fit_transform(X_treino)
+    X_teste_escalonado = scaler.transform(X_teste)
     
     X_treino_escalonado_df = pd.DataFrame(X_treino_escalonado, columns=X_treino.columns)
     X_teste_escalonado_df = pd.DataFrame(X_teste_escalonado, columns=X_teste.columns)
@@ -111,8 +111,8 @@ def balancear(X_treino, y_treino):
     print("\nDistribuição após SMOTE:")
     print(Counter(y_treino_balanceado))
 
-    X_treino_balanceado_df = pd.DataFrame(X_treino_balanceado, columns=X_treino.columns)    
-    y_treino_balanceado_df = pd.Series(y_treino_balanceado, columns=y_treino.columns)    
+    X_treino_balanceado_df = pd.DataFrame(X_treino_balanceado, columns=X_treino.columns)
+    y_treino_balanceado_df = pd.Series(y_treino_balanceado, name=y_treino.name)
 
     print('\nFinalizando o escalonamento')
 

@@ -28,7 +28,7 @@ y = dados[coluna_target]
 
 X_treino, X_teste, y_treino, y_teste = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-X_treino_escalonado, X_teste_escalonado = pre_processamento.escalonar(RobustScaler(), X_treino, X_teste)
-# também pode usar pre_processamento.escalonar com StandardScaler() ou MinMaxScaler() no lugar de RobustScaler()
+X_treino_escalonado, X_teste_escalonado = pre_processamento.tratar_escala(RobustScaler(), X_treino, X_teste)
+# também pode usar pre_processamento.escalar com StandardScaler() ou MinMaxScaler() no lugar de RobustScaler()
 
 X_treino_balanceado, y_treino_balanceado = pre_processamento.balancear(X_treino_escalonado, y_treino)
