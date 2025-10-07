@@ -71,8 +71,8 @@ def escalonar(escalonador, X_treino, X_teste):
         X_teste: dados de teste
 
     Retorno:
-        X_treino_escalonado: dados de treino escalonados
-        X_teste_escalonado: dados de teste escalonados
+        X_treino após escalonamento
+        X_teste após escalonamento
     '''
 
     print('\nIniciando o escalonamento')
@@ -87,7 +87,7 @@ def escalonar(escalonador, X_treino, X_teste):
 
     return X_treino_escalonado_df, X_teste_escalonado_df
 
-def balancear(dados, coluna_target):
+def balancear(X_treino, y_treino):
     '''
     Gera novos registros para equilibrar a quantidade deles de acordo com a coluna_target
 
@@ -102,19 +102,18 @@ def balancear(dados, coluna_target):
 
     print('\nIniciando o escalonamento')
 
-    X = dados.drop(columns=[coluna_target])
-    y = dados[coluna_target]
-
     print("Distribuição original das classes:")
-    print(Counter(y))
+    print(Counter(y_treino))
 
     smote = SMOTE(random_state=42)
-    X_res, y_res = smote.fit_resample(X, y)
+    X_treino_balanceado, y_treino_balanceado = smote.fit_resample(X_treino, y_treino)
 
     print("\nDistribuição após SMOTE:")
-    print(Counter(y_res))
+    print(Counter(y_treino_balanceado))
+
+    X_treino_balanceado_df = pd.DataFrame(X_treino_balanceado, columns=X_treino.columns)    
+    y_treino_balanceado_df = pd.Series(y_treino_balanceado, columns=y_treino.columns)    
 
     print('\nFinalizando o escalonamento')
 
-    # X_res_df = pd.DataFrame(X_res, columns=X.columns)
-    # y_res_df = pd.Series(y_res, name=coluna_target)
+    return X_treino_balanceado_df, y_treino_balanceado_df

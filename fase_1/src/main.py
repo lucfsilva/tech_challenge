@@ -28,11 +28,7 @@ y = dados[coluna_target]
 
 X_treino, X_teste, y_treino, y_teste = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# X_train_regressao_logistica = pre_processamento.escalonar_para_regressao_logistica(X_train, 'Outcome')
-# X_train_para_knn = pre_processamento.escalonar_para_knn(X_train, 'Outcome')
-# X_train_para_outliers = pre_processamento.escalonar_para_outliers(X_train, 'Outcome')
-    # X_train_scaled_df, X_test_scaled_df = escalonar(StandardScaler(), X_train, X_test)
-    # X_train_scaled_df, X_test_scaled_df = escalonar(MinMaxScaler(), X_train, X_test)
-    # X_train_scaled_df, X_test_scaled_df = escalonar(RobustScaler(), X_train, X_test)
+X_treino_escalonado, X_teste_escalonado = pre_processamento.escalonar(RobustScaler(), X_treino, X_teste)
+# também pode usar pre_processamento.escalonar com StandardScaler() ou MinMaxScaler() no lugar de RobustScaler()
 
-# dados = pre_processamento.balancear(X_train, 'Outcome') # -> Precisa ser feito após o escalonamento
+X_treino_balanceado, y_treino_balanceado = pre_processamento.balancear(X_treino_escalonado, y_treino)
