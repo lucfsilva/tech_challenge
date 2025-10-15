@@ -11,12 +11,13 @@ def analisar_modelos(modelos, X_treino_balanceado, y_treino_balanceado, X_teste_
         y_proba = modelo.predict_proba(X_teste_escalonado)[:, 1]
 
         resultados.append({
-            "Modelo": nome,
+            "Nome": nome,
             "Accuracy": accuracy_score(y_teste, y_pred),
             "Precision": precision_score(y_teste, y_pred),
             "Recall": recall_score(y_teste, y_pred),
             "F1-score": f1_score(y_teste, y_pred),
-            "AUC": roc_auc_score(y_teste, y_proba)
+            "AUC": roc_auc_score(y_teste, y_proba),
+            "Modelo": modelo
         })
 
         print(f"\n===== {nome} =====")
@@ -24,7 +25,7 @@ def analisar_modelos(modelos, X_treino_balanceado, y_treino_balanceado, X_teste_
 
     df_resultados = pd.DataFrame(resultados)
     print("\nResumo comparativo dos modelos:")
-    print(df_resultados)
+    print(df_resultados.drop(columns=['Modelo']))
 
     # plt.figure(figsize=(10, 8))
 
@@ -54,8 +55,8 @@ def analisar_modelos(modelos, X_treino_balanceado, y_treino_balanceado, X_teste_
     # Foi adotado o Recall como avaliador do melhor modelo pois ele é o mais relacionado a "Verdadeiros positivos", o que é uma métrica importante para diagnósticos médicos.
     # F1-score foi descartado por ser uma média (ponderada) que, apesar de relevante, parece menos importante que o Recall.
     # O Accuracy foi descartado pois os dados estão muito desbalanceados e isso pode afetá-lo negativamente. 
-    melhor_modelo = df_resultados.loc[df_resultados['Recall'].idxmax()]
+    df_resultados_melhor_modelo = df_resultados.loc[df_resultados['Recall'].idxmax()]
     print('\nMelhor modelo com base no Recall:')
-    print(melhor_modelo)    
+    print(df_resultados_melhor_modelo.drop('Modelo'))    
 
-    return melhor_modelo
+    return df_resultados_melhor_modelo['Modelo']

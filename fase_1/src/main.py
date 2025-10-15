@@ -10,9 +10,10 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import *
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report
 
-print('Tech Challenge - Fase 1')
+print('Início do Tech Challenge - Fase 1')
 print('Diagnóstico de diabetes\n')
 
 destino = Path().cwd() / 'fase_1' / 'data'
@@ -71,3 +72,16 @@ modelos = {
 }
 
 melhor_modelo = predicao.analisar_modelos(modelos, X_treino_balanceado, y_treino_balanceado, X_teste_escalado, y_teste)
+
+# ----------------------------
+# Avaliação final no conjunto de teste
+# ----------------------------
+y_predito_final = melhor_modelo.predict(X_teste_escalado)
+print('\n' + classification_report(y_teste, y_predito_final))
+
+# Ainda é preciso interpretar os resultados usando feature importance e SHAP.
+
+# Discussão dos resultados: 
+# - O modelo pode ser usado na prática? Como?
+
+print('\nFim do Tech Challenge - Fase 1')
