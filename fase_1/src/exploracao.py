@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
-def analisar_dados(dados, coluna_target):
+def analisar_dados(dados, coluna_target, metodo_correlacao='pearson'):
     '''
     Mostra informações relevantes sobre os dados para que se possa tomar decisões 
     quanto a limpeza deles antes de usá-los no treinamento de uma IA.
@@ -43,15 +43,15 @@ def analisar_dados(dados, coluna_target):
     # ----------------------------
     plt.figure(figsize=(6,4))
     sns.countplot(x=coluna_target, data=dados, palette='Set2', hue=coluna_target, legend=False)
-    plt.title(f'Distribuição da variável coluna_target ({coluna_target})')
-    plt.xlabel(f'{coluna_target} (0 = Não, 1 = Sim)')
+    plt.title(f'Distribuição da variável ({coluna_target})')
+    plt.xlabel(f'{coluna_target} (0 = Não diabético, 1 = Diabético)')
     plt.ylabel('Contagem')
     plt.show()
 
     # ----------------------------
     # Histogramas das variáveis numéricas
     # ----------------------------
-    dados.hist(bins=20, figsize=(14,10), edgecolor='black')
+    dados_sem_coluna_target.hist(bins=20, figsize=(14,10), edgecolor='black')
     plt.suptitle('Distribuição das variáveis numéricas', fontsize=16)
     plt.show()
 
@@ -80,10 +80,21 @@ def analisar_dados(dados, coluna_target):
     # ----------------------------
     # Correlação entre variáveis
     # ----------------------------
-    # plt.figure(figsize=(10,8))
-    # sns.heatmap(dados.corr(), annot=True, cmap='coolwarm', fmt='.2f')
-    # plt.title('Matriz de Correlação')
-    # plt.show()
+
+    print("Matriz de correlação:")
+    matriz_de_correlacao = dados.corr(method=metodo_correlacao)
+    print(matriz_de_correlacao)
+
+    plt.figure(figsize=(10,8))
+    sns.heatmap(matriz_de_correlacao, annot=True, cmap='coolwarm', fmt='.2f')
+    plt.title('Mapa de calor da matriz de correlação')
+    plt.show()
+
+    correlacao = matriz_de_correlacao[coluna_target].drop(coluna_target)
+    ranking = correlacao.abs().sort_values(ascending=False)
+
+    print("\nRanking das variáveis mais correlacionadas com Outcome:")
+    print(ranking)
 
     # ----------------------------
     # Testes estatísticos
@@ -116,43 +127,3 @@ def analisar_dados(dados, coluna_target):
             print("👉 Não há diferença significativa")    
 
     print('\nFinalizando análise dos dados')
-
-def analisar_correlacao(dados, coluna_target, sufixo_outlier, metodo_correlacao='pearson'):
-    '''
-    Verifica a correção entre a coluna_target e as demais colunas, descartando as colunas cujo nome termina em sufixo_outlier
-
-    Parâmetros:
-        dados (DataFrame): tabela com informações que serão analisadas.
-        coluna_target (str): nome da coluna usada que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
-            Exemplo: na análise de dados médicos, a coluna_target pode ser aquela que mostra um diagnóstico como positivo ou negativo.
-    '''
-
-
-    colunas_originais = [coluna for coluna in dados.columns if not coluna.endswith(sufixo_outlier)]
-    dados_correlacao = dados[colunas_originais]
-
-    # ----------------------------
-    # Calcular matriz de correlação
-    # ----------------------------
-    corr_matrix = dados_correlacao.corr(method=metodo_correlacao)
-
-    print("Matriz de correlação:")
-    print(corr_matrix)
-
-    # ----------------------------
-    # Mapa de calor da matriz de correlação
-    # ----------------------------
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", cbar=True)
-    plt.title("Mapa de Calor da Matriz de Correlação")
-    plt.show()
-
-    # ----------------------------
-    # Ranking das variáveis mais correlacionadas com Outcome
-    # ----------------------------
-    corr_with_target = corr_matrix[coluna_target].drop(coluna_target)
-    ranking = corr_with_target.abs().sort_values(ascending=False)
-
-    print("\nRanking das variáveis mais correlacionadas com Outcome:")
-    print(ranking)
-    

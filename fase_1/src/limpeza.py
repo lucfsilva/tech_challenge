@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.impute import KNNImputer
 
-def remover_duplicados(dados):
+def remover_duplicados(dados) -> pd.DataFrame:
     '''
     Remove os registros que possuem mais de uma cópia idêntica nos dados.
 
@@ -85,7 +85,7 @@ def tratar_ausencias(
         limite_skew_imputacao_simples=0.5, 
         limite_inferior_imputacao_avancada=20, 
         limite_superir_imputacao_avancada=40,
-        n_vizinhos_knn_imputacao_avancada=5):
+        n_vizinhos_knn_imputacao_avancada=5) -> pd.DataFrame:
     '''
     Aplica os seguintes tratamentos para as colunas_positivas que estejam zeradas ou não preenchidas:
     - Imputação simples para ausências entre o limte_inferior_imputacao_simples e limite_superior_imputacao_simples.
@@ -157,7 +157,7 @@ def limpar_dados(
         limite_skew_imputacao_simples=0.5, 
         limite_inferior_imputacao_avancada=20, 
         limite_superir_imputacao_avancada=40,
-        n_vizinhos_knn_imputacao_avancada=5):
+        n_vizinhos_knn_imputacao_avancada=5) -> pd.DataFrame:
     '''
     Aplica os seguintes tratamentos aos dados:
     - Remoção de registros duplicados.

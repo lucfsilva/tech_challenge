@@ -4,7 +4,7 @@ from imblearn.over_sampling import SMOTE
 from collections import Counter
 from scipy.stats import zscore
 
-def tratar_outliers(dados, limite_skew=0.5, limite_zscore=3):
+def tratar_outliers(dados, limite_skew=0.5, limite_zscore=3) -> pd.DataFrame:
     '''
     Aplica os seguintes tratamentos para outliers:
     - Método Z-score para coluna com skew menor que limite_skew
@@ -17,7 +17,6 @@ def tratar_outliers(dados, limite_skew=0.5, limite_zscore=3):
 
     Retorno:
         dados: conjunto de informações após tratamento.
-        sufixo_outlier: sufixo usado no nome das novas colunas criadas para identificar outliers
     '''
 
     print('\nIniciando o tratamento de outliers')
@@ -59,33 +58,33 @@ def tratar_outliers(dados, limite_skew=0.5, limite_zscore=3):
 
     print('\nFinalizando o tratamento de outliers')
 
-    return dados, sufixo_outlier
+    return dados
 
 def tratar_escala(scaler, X_treino, X_teste):
     '''
     Ajusta os dados para a escala de cada coluna
 
     Parâmetros:
-        scaler: escalonador que será usado
+        scaler: escalador que será usado
         X_treino: dados de treino
         X_teste: dados de teste
 
     Retorno:
-        X_treino após escalonamento
-        X_teste após escalonamento
+        X_treino após aplicação do escalador
+        X_teste após aplicação do escalador
     '''
 
-    print('\nIniciando o escalonamento')
+    print('\nIniciando o tratamento de escala')
     
-    X_treino_escalonado = scaler.fit_transform(X_treino)
-    X_teste_escalonado = scaler.transform(X_teste)
+    X_treino_escalado = scaler.fit_transform(X_treino)
+    X_teste_escalado = scaler.transform(X_teste)
     
-    X_treino_escalonado_df = pd.DataFrame(X_treino_escalonado, columns=X_treino.columns)
-    X_teste_escalonado_df = pd.DataFrame(X_teste_escalonado, columns=X_teste.columns)
+    X_treino_escalado_df = pd.DataFrame(X_treino_escalado, columns=X_treino.columns)
+    X_teste_escalado_df = pd.DataFrame(X_teste_escalado, columns=X_teste.columns)
 
-    print('\nFinalizando o escalonamento')
+    print('\nFinalizando o tratamento de escala')
 
-    return X_treino_escalonado_df, X_teste_escalonado_df
+    return X_treino_escalado_df, X_teste_escalado_df
 
 def balancear(X_treino, y_treino):
     '''
