@@ -49,7 +49,7 @@ y = dados[coluna_target]
 
 X_treino, X_teste, y_treino, y_teste = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-X_treino_escalado, X_teste_escalado = pre_processamento.tratar_escala(MinMaxScaler(), X_treino, X_teste)
+X_treino_escalado, X_teste_escalado = pre_processamento.tratar_escala(RobustScaler(), X_treino, X_teste)
 # Pode usar pre_processamento.escalar com RobustScaler(), StandardScaler() ou MinMaxScaler().
 
 X_treino_balanceado, y_treino_balanceado = pre_processamento.balancear(X_treino_escalado, y_treino)
