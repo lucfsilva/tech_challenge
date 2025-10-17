@@ -1,129 +1,153 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import ttest_ind, mannwhitneyu, shapiro
 
-def analisar_dados(dados, coluna_target, metodo_correlacao='pearson'):
+def analise_descritiva(dados: pd.DataFrame):
     '''
-    Mostra informações relevantes sobre os dados para que se possa tomar decisões 
-    quanto a limpeza deles antes de usá-los no treinamento de uma IA.
+    Descreve características relevantes dos dados, como:
+    - Dimensão (quantidade de linhas e colunas)
+    - Estrutura (tipo de informação, quantidade de nulos, etc)
+    - Primeiras linhas
+    - Resumo estatístico por coluna (quantidade, média, mínimo, máximo, etc)
 
     Parâmetros:
-        dados: conjunto de informações que devem ser analisadas.
-        coluna_target (str): nome da coluna que identifica se um registro é verdadeiro ou falso para a pergunta que se quer responder. 
-            Exemplo: na análise de dados médicos, a coluna_target pode ser aquela que mostra um diagnóstico como positivo ou negativo.
+        dados: DataFrame que deve ser exibido
     '''
 
-    print('Iniciando análise dos dados')
+    print('Iniciando análise descritiva dos dados')
 
-    # ----------------------------
-    # Cópia dos dados, porém sem a coluna_target
-    # ----------------------------
-    dados_sem_coluna_target = dados.drop(columns=[coluna_target])
+    print('\nDimensão:', dados.shape)
 
-    # ----------------------------
-    # Estatísticas descritivas
-    # ----------------------------
-    print('\nDimensão do dataset:', dados.shape)
-
-    print('\nEstrutura do dataset:')
+    print('\nEstrutura:')
     print(dados.info())
 
-    print('\nPrimeiras linhas do dataset:')
+    print('\nPrimeiras linhas:')
     print(dados.head())
 
     print('\nResumo estatístico:')
     print(dados.describe())
 
-    print(f'\nContagem de valores por classe em {coluna_target}:')
-    print(dados[coluna_target].value_counts())
+    print('\nFinalizando análise descritiva dos dados')
+
+def analise_grafica(dados: pd.DataFrame):
+    '''
+    Mostra gráficos com características relevantes dos dados, como:
+    - Distribuição do diagnóstico
+    - Boxplot das características clínicas.
+    - Proporção de outliers por característica clínica.
+    - Mapa de calor entre características clínicas e diagnóstico.
+    - Ranking de correlação entre características clínicas e diagnóstico.
+
+    Parâmetros:
+        dados: DataFrame que deve ser analisado
+    '''
+
+    print('\nIniciando análise gráfica dos dados')
+
+    dados = dados.rename(columns={
+        'Pregnancies': 'Gestações',
+        'Glucose': 'Glicose',
+        'BloodPressure': 'Pressão arterial',
+        'SkinThickness': 'Espessura da pele',
+        'Insulin': 'Insulina',
+        'BMI': 'IMC',
+        'DiabetesPedigreeFunction': 'Hereditariedade',
+        'Age': 'Idade',
+        'Outcome': 'Diagnóstico'
+    })
 
     # ----------------------------
-    # Visualização da variável coluna_target
+    # Distribuição do diagnóstico
     # ----------------------------
-    plt.figure(figsize=(6,4))
-    sns.countplot(x=coluna_target, data=dados, palette='Set2', hue=coluna_target, legend=False)
-    plt.title(f'Distribuição da variável ({coluna_target})')
-    plt.xlabel(f'{coluna_target} (0 = Não diabético, 1 = Diabético)')
-    plt.ylabel('Contagem')
+    contagens = dados['Diagnóstico'].value_counts().sort_index()
+
+    plt.figure(figsize=(5, 5))
+    plt.pie(
+        contagens,
+        labels=['Não diabético', 'Diabético'],
+        autopct='%1.2f%%',
+        startangle=90,
+        colors=sns.color_palette('Set2')
+    )
+    plt.title('Distribuição de diagnósticos')
     plt.show()
 
     # ----------------------------
-    # Histogramas das variáveis numéricas
+    # Boxplot das características clínicas
     # ----------------------------
-    dados_sem_coluna_target.hist(bins=20, figsize=(14,10), edgecolor='black')
-    plt.suptitle('Distribuição das variáveis numéricas', fontsize=16)
-    plt.show()
+    dados_sem_diagnostico = dados.drop('Diagnóstico', axis=1)
 
-    # ----------------------------
-    # Boxplots das variáveis numéricas, comparando-as com o coluna_target
-    # ----------------------------
-    plt.figure(figsize=(14,10))
-    for i, coluna in enumerate(dados_sem_coluna_target.columns):
+    plt.figure(figsize=(10,8))
+    plt.suptitle('Características clínicas', fontsize=14)
+    for i, coluna in enumerate(dados_sem_diagnostico.columns):
         plt.subplot(3, 3, i+1)
-        sns.boxplot(y=coluna, x=coluna_target, data=dados, palette='Set2', hue=coluna_target, legend=False)
-        plt.title(f'{coluna} vs {coluna_target}')
+        sns.boxplot(y=coluna, data=dados_sem_diagnostico, color='skyblue')
+        plt.title(f'{coluna}')
+        plt.ylabel('')
     plt.tight_layout()
     plt.show()
 
     # ----------------------------
-    # KDE (distribuição por classe)
+    # Proporção de outliers por característica clínica, usando IQR
     # ----------------------------
-    plt.figure(figsize=(14,10))
-    for i, coluna in enumerate(dados_sem_coluna_target.columns):
-        plt.subplot(3, 3, i+1)
-        sns.kdeplot(data=dados, x=coluna, hue=coluna_target, fill=True, common_norm=False, alpha=0.5, palette="Set2")
-        plt.title(f'Distribuição de {coluna} por {coluna_target}')
+    fig, axes = plt.subplots(3, 3, figsize=(10, 8))
+    axes = axes.flatten()
+
+    for i, coluna in enumerate(dados_sem_diagnostico.columns):
+        Q1 = dados_sem_diagnostico[coluna].quantile(0.25)
+        Q3 = dados_sem_diagnostico[coluna].quantile(0.75)
+        IQR = Q3 - Q1
+        limite_inferior = Q1 - 1.5 * IQR
+        limite_superior = Q3 + 1.5 * IQR
+
+        outliers = ((dados_sem_diagnostico[coluna] < limite_inferior) | 
+                    (dados_sem_diagnostico[coluna] > limite_superior))
+
+        num_outliers = outliers.sum()
+        num_normais = len(outliers) - num_outliers
+
+        eixos = axes[i]
+        eixos.pie(
+            [num_normais, num_outliers],
+            labels=['Normais', 'Outliers'],
+            autopct='%1.1f%%',
+            colors=['skyblue', 'salmon'],
+            startangle=90
+        )
+        eixos.set_title(coluna)
+
+    for j in range(i + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.suptitle('Proporção de outliers por característica clínica', fontsize=14)
     plt.tight_layout()
-    plt.show()    
+    plt.show()
 
     # ----------------------------
-    # Correlação entre variáveis
+    # Mapa de calor entre características clínicas e diagnóstico
     # ----------------------------
-
-    print("Matriz de correlação:")
-    matriz_de_correlacao = dados.corr(method=metodo_correlacao)
-    print(matriz_de_correlacao)
+    matriz_de_correlacao = dados.corr()
 
     plt.figure(figsize=(10,8))
     sns.heatmap(matriz_de_correlacao, annot=True, cmap='coolwarm', fmt='.2f')
-    plt.title('Mapa de calor da matriz de correlação')
+    plt.title('Mapa de calor')
     plt.show()
 
-    correlacao = matriz_de_correlacao[coluna_target].drop(coluna_target)
+    # ----------------------------
+    # Ranking da correlação entre características clínicas e diagnóstico
+    # ----------------------------
+    correlacao = matriz_de_correlacao['Diagnóstico'].drop('Diagnóstico')
+    coluna_X = 'Característica clínica'
+    coluna_y = 'Correlação com diagnóstico'
     ranking = correlacao.abs().sort_values(ascending=False)
+    ranking_df = ranking.reset_index()
+    ranking_df.columns = [coluna_X, coluna_y]
 
-    print("\nRanking das variáveis mais correlacionadas com Outcome:")
-    print(ranking)
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=ranking_df, x=coluna_X, y=coluna_y, color='skyblue')
+    plt.title('Ranking de correlação do diagnóstico', fontsize=14)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
 
-    # ----------------------------
-    # Testes estatísticos
-    # ----------------------------
-    print("\n===== Testes Estatísticos =====")
-    grupo0 = dados[dados[coluna_target] == 0]
-    grupo1 = dados[dados[coluna_target] == 1]
-
-    for coluna in dados_sem_coluna_target.columns:
-        print(f"\n--- {coluna} ---")
-        
-        # Teste de normalidade (Shapiro-Wilk)
-        stat0, p0 = shapiro(grupo0[coluna])
-        stat1, p1 = shapiro(grupo1[coluna])
-        
-        if p0 > 0.05 and p1 > 0.05:
-            # Se ambas distribuições são normais -> teste t
-            stat, p = ttest_ind(grupo0[coluna], grupo1[coluna])
-            teste = "t de Student (paramétrico)"
-        else:
-            # Se não são normais -> Mann-Whitney
-            stat, p = mannwhitneyu(grupo0[coluna], grupo1[coluna])
-            teste = "Mann-Whitney U (não-paramétrico)"
-        
-        print(f"Teste: {teste}")
-        print(f"Estatística = {stat:.4f}, p-valor = {p:.4f}")
-        if p < 0.05:
-            print("👉 Diferença significativa entre os grupos")
-        else:
-            print("👉 Não há diferença significativa")    
-
-    print('\nFinalizando análise dos dados')
+    print('\nFinalizando análise gráfica dos dados')
