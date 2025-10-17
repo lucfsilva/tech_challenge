@@ -29,8 +29,9 @@ dados = pandas.read_csv(destino / 'diabetes.csv')
 # Análise dos dados antes da aplicação da limpeza e tratamento de outliers
 # ----------------------------
 exploracao.analise_descritiva(dados)
-colunas_positivas = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']
 exploracao.analise_grafica(dados)
+
+# colunas_positivas = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']
 
 # ----------------------------
 # Limpeza dos dados e tratamento de outliers

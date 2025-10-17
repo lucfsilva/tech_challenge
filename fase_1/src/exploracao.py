@@ -42,8 +42,6 @@ def analise_grafica(dados: pd.DataFrame):
         dados: DataFrame que deve ser analisado
     '''
 
-    print('\nIniciando análise gráfica dos dados')
-
     dados = dados.rename(columns={
         'Pregnancies': 'Gestações',
         'Glucose': 'Glicose',
@@ -149,5 +147,3 @@ def analise_grafica(dados: pd.DataFrame):
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plt.show()
-
-    print('\nFinalizando análise gráfica dos dados')
