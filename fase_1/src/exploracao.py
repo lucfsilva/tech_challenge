@@ -9,14 +9,17 @@ def analise_descritiva(dados: pd.DataFrame):
     - Estrutura (tipo de informação, quantidade de nulos, etc)
     - Primeiras linhas
     - Resumo estatístico por coluna (quantidade, média, mínimo, máximo, etc)
+    - Proporção de zeros e nulos por coluna
 
     Parâmetros:
         dados: DataFrame que deve ser exibido
     '''
 
-    print('Iniciando análise descritiva dos dados')
+    print('Iniciando a análise descritiva')
 
     print('\nDimensão:', dados.shape)
+
+    print(f"\nNúmero de registros duplicados: {dados.duplicated().sum()}")
 
     print('\nEstrutura:')
     print(dados.info())
@@ -27,7 +30,18 @@ def analise_descritiva(dados: pd.DataFrame):
     print('\nResumo estatístico:')
     print(dados.describe())
 
-    print('\nFinalizando análise descritiva dos dados')
+    # Proporção de zeros e nulos
+    total = len(dados)
+    contagem = pd.DataFrame({
+        'Zeros': ((dados == 0).sum() / total * 100).round(2),
+        'Nulos': (dados.isna().sum() / total * 100).round(2)
+    })
+    contagem = contagem.map(lambda x: f"{x:.2f} %")
+
+    print('\nProporção de zeros e nulos:')
+    print(contagem)
+
+    print('\nFinalizando a análise descritiva')
 
 def analise_grafica(dados: pd.DataFrame):
     '''
@@ -42,17 +56,7 @@ def analise_grafica(dados: pd.DataFrame):
         dados: DataFrame que deve ser analisado
     '''
 
-    dados = dados.rename(columns={
-        'Pregnancies': 'Gestações',
-        'Glucose': 'Glicose',
-        'BloodPressure': 'Pressão arterial',
-        'SkinThickness': 'Espessura da pele',
-        'Insulin': 'Insulina',
-        'BMI': 'IMC',
-        'DiabetesPedigreeFunction': 'Hereditariedade',
-        'Age': 'Idade',
-        'Outcome': 'Diagnóstico'
-    })
+    print('\nIniciando a análise gráfica')
 
     # ----------------------------
     # Distribuição do diagnóstico
@@ -147,3 +151,5 @@ def analise_grafica(dados: pd.DataFrame):
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plt.show()
+
+    print('\nFinalizando a análise gráfica')
