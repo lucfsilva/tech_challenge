@@ -6,14 +6,18 @@ from pathlib import Path
 
 def carregar(origem: str) -> pd.DataFrame:
     '''
-    Carrega um DataSet do Kaggle em um DataFrame do Pandas.
+    Carrega um Dataset do Kaggle em um DataFrame do Pandas.
 
     Parâmetros:
-        dados: DataFrame que deve ser exibido
+        origem(str): identificador do Dataset no Kaggle.
+
+    Retorno:
+        DataFrame com o conteúdo do Dataset do Kaggle.
     '''
 
-    print('\nIniciando o carregamento dos dados\n')
+    print('\nIniciando o carregamento dos dados')
 
+    print('')
     endereco_de_origem = kagglehub.dataset_download(handle=origem, force_download=True)
     diretorio_de_origem = Path(endereco_de_origem).resolve()
 
@@ -24,6 +28,8 @@ def carregar(origem: str) -> pd.DataFrame:
             lista_dados_csv.append(pd.read_csv(item))
 
     dados = pd.concat(lista_dados_csv, axis=0, ignore_index=True)
+
+    # dados = pd.read_csv(Path().cwd() / 'fase_1' / 'data' / 'diabetes.csv') # Para trabalhar com o arquivo localmente.
     
     print('\nFinalizando o carregamento dos dados')
     
@@ -36,7 +42,7 @@ def analise_descritiva(dados: pd.DataFrame):
     - Zeros inválidos
 
     Parâmetros:
-        dados: DataFrame que deve ser exibido
+        dados: DataFrame que deve ser analisado
     '''
 
     print('\nIniciando a análise descritiva dos dados')
@@ -61,7 +67,6 @@ def analise_grafica(dados: pd.DataFrame):
     Mostra gráficos com características relevantes dos dados, como:
     - Distribuição do diagnóstico
     - Boxplot das características.
-    - Proporção de outliers por característica.
     - Mapa de calor entre características e diagnóstico.
     - Ranking de correlação entre características e diagnóstico.
 
@@ -99,38 +104,38 @@ def analise_grafica(dados: pd.DataFrame):
     plt.show()
 
     # Proporção de outliers das característica, usando IQR
-    fig, axes = plt.subplots(3, 3, figsize=(10, 8))
-    axes = axes.flatten()
+    # fig, axes = plt.subplots(3, 3, figsize=(10, 8))
+    # axes = axes.flatten()
 
-    for i, coluna in enumerate(dados_sem_diagnostico.columns):
-        Q1 = dados_sem_diagnostico[coluna].quantile(0.25)
-        Q3 = dados_sem_diagnostico[coluna].quantile(0.75)
-        IQR = Q3 - Q1
-        limite_inferior = Q1 - 1.5 * IQR
-        limite_superior = Q3 + 1.5 * IQR
+    # for i, coluna in enumerate(dados_sem_diagnostico.columns):
+    #     Q1 = dados_sem_diagnostico[coluna].quantile(0.25)
+    #     Q3 = dados_sem_diagnostico[coluna].quantile(0.75)
+    #     IQR = Q3 - Q1
+    #     limite_inferior = Q1 - 1.5 * IQR
+    #     limite_superior = Q3 + 1.5 * IQR
 
-        outliers = ((dados_sem_diagnostico[coluna] < limite_inferior) | 
-                    (dados_sem_diagnostico[coluna] > limite_superior))
+    #     outliers = ((dados_sem_diagnostico[coluna] < limite_inferior) | 
+    #                 (dados_sem_diagnostico[coluna] > limite_superior))
 
-        num_outliers = outliers.sum()
-        num_normais = len(outliers) - num_outliers
+    #     num_outliers = outliers.sum()
+    #     num_normais = len(outliers) - num_outliers
 
-        eixos = axes[i]
-        eixos.pie(
-            [num_normais, num_outliers],
-            labels=['Normais', 'Outliers'],
-            autopct='%1.1f%%',
-            colors=['skyblue', 'salmon'],
-            startangle=90
-        )
-        eixos.set_title(coluna)
+    #     eixos = axes[i]
+    #     eixos.pie(
+    #         [num_normais, num_outliers],
+    #         labels=['Normais', 'Outliers'],
+    #         autopct='%1.1f%%',
+    #         colors=['skyblue', 'salmon'],
+    #         startangle=90
+    #     )
+    #     eixos.set_title(coluna)
 
-    for j in range(i + 1, len(axes)):
-        fig.delaxes(axes[j])
+    # for j in range(i + 1, len(axes)):
+    #     fig.delaxes(axes[j])
 
-    plt.suptitle('Outliers', fontsize=14)
-    plt.tight_layout()
-    plt.show()
+    # plt.suptitle('Outliers', fontsize=14)
+    # plt.tight_layout()
+    # plt.show()
 
     # Mapa de calor entre características e diagnóstico
     matriz_de_correlacao = dados.corr()

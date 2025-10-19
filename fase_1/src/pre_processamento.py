@@ -34,9 +34,9 @@ def limpar(dados: pd.DataFrame) -> pd.DataFrame:
 
     return dados
 
-def escalonar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def padronizar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     '''
-    Aplica padronização nas colunas, pois assim não causa impacto nos outliers
+    Aplica padronização nas colunas, para que todas tenham uma escala semelhante.
 
     Parâmetros:
         X_treino: dados de treino
@@ -50,15 +50,15 @@ def escalonar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFra
     print('\nIniciando o escalonamento dos dados')
     
     scaler = StandardScaler()
-    X_treino_escalado = scaler.fit_transform(X_treino)
-    X_teste_escalado = scaler.transform(X_teste)
+    X_treino_padronizado = scaler.fit_transform(X_treino)
+    X_teste_padronizado = scaler.transform(X_teste)
     
-    X_treino_escalado_df = pd.DataFrame(X_treino_escalado, columns=X_treino.columns)
-    X_teste_escalado_df = pd.DataFrame(X_teste_escalado, columns=X_teste.columns)
+    X_treino_padronizado_df = pd.DataFrame(X_treino_padronizado, columns=X_treino.columns)
+    X_teste_padronizado_df = pd.DataFrame(X_teste_padronizado, columns=X_teste.columns)
 
     print('\nFinalizando o escalonamento dos dados')
 
-    return X_treino_escalado_df, X_teste_escalado_df
+    return X_treino_padronizado_df, X_teste_padronizado_df
 
 def balancear(X_treino: pd.DataFrame, y_treino: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     '''
