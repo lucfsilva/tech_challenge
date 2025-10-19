@@ -1,17 +1,19 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import KNNImputer, SimpleImputer
+from imblearn.over_sampling import SMOTE
 
-def limpeza(dados: pd.DataFrame) -> pd.DataFrame:
+def limpar(dados: pd.DataFrame) -> pd.DataFrame:
     '''
     Trata as informações que podem prejudicar o treinamento do modelo, como zeros inválidos.
     Foi considerado que as seguintes colunas devem sempre ter um valor maior do que zero:
-    - Glicose
-    - Pressão arterial
-    - Espessura da pele
-    - Insulina
-    - IMC
-    - Idade
+    - Glucose
+    - BloodPressure
+    - SkinThickness
+    - Insulin
+    - BMI
+    - Age
 
     Parâmetros:
         dados: DataFrame com as informações que devem ser tratadas
@@ -19,35 +21,22 @@ def limpeza(dados: pd.DataFrame) -> pd.DataFrame:
     Retorno:
         DataFrame com as informações já tratadas
     '''
-    print('\nIniciando a limpeza')
+    print('\nIniciando a limpeza dos dados')
 
-    # Removendo colunas com grande quantidade de valores inválidos (acima de 25%)
-    # dados_limpeza.drop(columns=['Insulina', 'Espessura da pele'], axis=1)
-
-    # Tratamento de zeros em colunas onde isso é inválido.
-    colunas = ['Glicose', 'Pressão arterial', 'Espessura da pele', 'Insulina', 'IMC', 'Idade']
+    colunas = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']
     dados[colunas] = dados[colunas].replace(0, np.nan)
 
-    # Tratamento de nulos em colunas onde isso é inválido.
-    for coluna in colunas:
-        dados[coluna].fillna(dados[coluna].median()) # Preenchendo com mediana
-        # dados_limpeza[coluna].fillna(dados_limpeza[coluna].mean(), inplace=True) # Preenchendo com média
+    imputer = SimpleImputer(strategy='median')
+    # imputer = KNNImputer(n_neighbors=5) # Média e mediana afetaram muito os outliers, mas não parece ter impacto no resultado final
+    dados[colunas] = imputer.fit_transform(dados[colunas])
 
-        # Preenchendo com KNNImputer
-        # imputer = KNNImputer()
-        # dados_knn = pd.DataFrame(
-        #     imputer.fit_transform(dados_limpeza[coluna].to_frame()),
-        #     columns=[coluna]
-        # )
-        # dados_limpeza[coluna] = dados_knn[coluna]
-
-    print('\nFinalizando a limpeza')
+    print('\nFinalizando a limpeza dos dados')
 
     return dados
 
-def escalonamento(X_treino, X_teste):
+def escalonar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     '''
-    Ajusta os dados para a escala de cada coluna usando padronização, uma vez que há muitos outliers.
+    Aplica padronização nas colunas, pois assim não causa impacto nos outliers
 
     Parâmetros:
         X_treino: dados de treino
@@ -58,15 +47,34 @@ def escalonamento(X_treino, X_teste):
         X_teste escalonado
     '''
 
-    print('\nIniciando o escalonamento')
+    print('\nIniciando o escalonamento dos dados')
     
-    scaler = StandardScaler() 
+    scaler = StandardScaler()
     X_treino_escalado = scaler.fit_transform(X_treino)
     X_teste_escalado = scaler.transform(X_teste)
     
     X_treino_escalado_df = pd.DataFrame(X_treino_escalado, columns=X_treino.columns)
     X_teste_escalado_df = pd.DataFrame(X_teste_escalado, columns=X_teste.columns)
 
-    print('\nFinalizando o escalonamento')
+    print('\nFinalizando o escalonamento dos dados')
 
     return X_treino_escalado_df, X_teste_escalado_df
+
+def balancear(X_treino: pd.DataFrame, y_treino: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    '''
+    Equilibra a quantidade de dados por diagóstico
+
+    Parâmetros:
+        X_treino: características de treino
+        y_treino: diagnósticos de treino
+
+    Retorno:
+        X_treino balanceado
+        y_treino balanceado
+    '''
+
+    print('\nIniciando o balanceamento dos dados')
+    X_treino_balanceado, y_treino_balanceado = SMOTE().fit_resample(X_treino, y_treino)
+    print('\nFinalizando o balanceamento dos dados')
+
+    return X_treino_balanceado, y_treino_balanceado    

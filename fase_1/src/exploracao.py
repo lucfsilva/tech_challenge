@@ -1,67 +1,78 @@
+import kagglehub
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
+from pathlib import Path
 
-def analise_descritiva(dados: pd.DataFrame):
+def carregar(origem: str) -> pd.DataFrame:
     '''
-    Descreve características relevantes dos dados, como:
-    - Dimensão (quantidade de linhas e colunas)
-    - Estrutura (tipo de informação, quantidade de nulos, etc)
-    - Primeiras linhas
-    - Resumo estatístico por coluna (quantidade, média, mínimo, máximo, etc)
-    - Proporção de zeros e nulos por coluna
+    Carrega um DataSet do Kaggle em um DataFrame do Pandas.
 
     Parâmetros:
         dados: DataFrame que deve ser exibido
     '''
 
-    print('Iniciando a análise descritiva')
+    print('\nIniciando o carregamento dos dados\n')
 
-    print('\nDimensão:', dados.shape)
+    endereco_de_origem = kagglehub.dataset_download(handle=origem, force_download=True)
+    diretorio_de_origem = Path(endereco_de_origem).resolve()
 
-    print(f"\nNúmero de registros duplicados: {dados.duplicated().sum()}")
+    lista_dados_csv = []
+
+    for item in diretorio_de_origem.iterdir():
+        if item.is_file() and item.suffix.lower() == '.csv':
+            lista_dados_csv.append(pd.read_csv(item))
+
+    dados = pd.concat(lista_dados_csv, axis=0, ignore_index=True)
+    
+    print('\nFinalizando o carregamento dos dados')
+    
+    return dados
+
+def analise_descritiva(dados: pd.DataFrame):
+    '''
+    Descreve características relevantes dos dados, como:
+    - Estrutura
+    - Zeros inválidos
+
+    Parâmetros:
+        dados: DataFrame que deve ser exibido
+    '''
+
+    print('\nIniciando a análise descritiva dos dados')
 
     print('\nEstrutura:')
     print(dados.info())
 
-    print('\nPrimeiras linhas:')
-    print(dados.head())
+    # print('\nResumo estatístico:')
+    # print(dados.describe())
 
-    print('\nResumo estatístico:')
-    print(dados.describe())
+    print('\nZeros inválidos:')
+    dados_invalidos = dados[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']] == 0
+    print((dados_invalidos.sum() / len(dados) * 100).round(2).map(lambda x: f'{x:.2f} %'))
 
-    # Proporção de zeros e nulos
-    total = len(dados)
-    contagem = pd.DataFrame({
-        'Zeros': ((dados == 0).sum() / total * 100).round(2),
-        'Nulos': (dados.isna().sum() / total * 100).round(2)
-    })
-    contagem = contagem.map(lambda x: f"{x:.2f} %")
+    # print('\nPrimeiras linhas:')
+    # print(dados.head())
 
-    print('\nProporção de zeros e nulos:')
-    print(contagem)
-
-    print('\nFinalizando a análise descritiva')
+    print('\nFinalizando a análise descritiva dos dados')
 
 def analise_grafica(dados: pd.DataFrame):
     '''
     Mostra gráficos com características relevantes dos dados, como:
     - Distribuição do diagnóstico
-    - Boxplot das características clínicas.
-    - Proporção de outliers por característica clínica.
-    - Mapa de calor entre características clínicas e diagnóstico.
-    - Ranking de correlação entre características clínicas e diagnóstico.
+    - Boxplot das características.
+    - Proporção de outliers por característica.
+    - Mapa de calor entre características e diagnóstico.
+    - Ranking de correlação entre características e diagnóstico.
 
     Parâmetros:
         dados: DataFrame que deve ser analisado
     '''
 
-    print('\nIniciando a análise gráfica')
+    print('\nIniciando a análise gráfica dos dados')
 
-    # ----------------------------
     # Distribuição do diagnóstico
-    # ----------------------------
-    contagens = dados['Diagnóstico'].value_counts().sort_index()
+    contagens = dados['Outcome'].value_counts().sort_index()
 
     plt.figure(figsize=(5, 5))
     plt.pie(
@@ -71,16 +82,14 @@ def analise_grafica(dados: pd.DataFrame):
         startangle=90,
         colors=sns.color_palette('Set2')
     )
-    plt.title('Distribuição de diagnósticos')
+    plt.title('Diagnósticos')
     plt.show()
 
-    # ----------------------------
-    # Boxplot das características clínicas
-    # ----------------------------
-    dados_sem_diagnostico = dados.drop('Diagnóstico', axis=1)
+    # Boxplot das características
+    dados_sem_diagnostico = dados.drop('Outcome', axis=1)
 
     plt.figure(figsize=(10,8))
-    plt.suptitle('Características clínicas', fontsize=14)
+    plt.suptitle('Características', fontsize=14)
     for i, coluna in enumerate(dados_sem_diagnostico.columns):
         plt.subplot(3, 3, i+1)
         sns.boxplot(y=coluna, data=dados_sem_diagnostico, color='skyblue')
@@ -89,9 +98,7 @@ def analise_grafica(dados: pd.DataFrame):
     plt.tight_layout()
     plt.show()
 
-    # ----------------------------
-    # Proporção de outliers por característica clínica, usando IQR
-    # ----------------------------
+    # Proporção de outliers das característica, usando IQR
     fig, axes = plt.subplots(3, 3, figsize=(10, 8))
     axes = axes.flatten()
 
@@ -121,13 +128,11 @@ def analise_grafica(dados: pd.DataFrame):
     for j in range(i + 1, len(axes)):
         fig.delaxes(axes[j])
 
-    plt.suptitle('Proporção de outliers por característica clínica', fontsize=14)
+    plt.suptitle('Outliers', fontsize=14)
     plt.tight_layout()
     plt.show()
 
-    # ----------------------------
-    # Mapa de calor entre características clínicas e diagnóstico
-    # ----------------------------
+    # Mapa de calor entre características e diagnóstico
     matriz_de_correlacao = dados.corr()
 
     plt.figure(figsize=(10,8))
@@ -135,21 +140,19 @@ def analise_grafica(dados: pd.DataFrame):
     plt.title('Mapa de calor')
     plt.show()
 
-    # ----------------------------
-    # Ranking da correlação entre características clínicas e diagnóstico
-    # ----------------------------
-    correlacao = matriz_de_correlacao['Diagnóstico'].drop('Diagnóstico')
-    coluna_X = 'Característica clínica'
-    coluna_y = 'Correlação com diagnóstico'
+    # Ranking da correlação entre características e diagnóstico
+    correlacao = matriz_de_correlacao['Outcome'].drop('Outcome')
+    coluna_X = 'Característica'
+    coluna_y = 'Correlação'
     ranking = correlacao.abs().sort_values(ascending=False)
     ranking_df = ranking.reset_index()
     ranking_df.columns = [coluna_X, coluna_y]
 
     plt.figure(figsize=(10, 6))
     sns.barplot(data=ranking_df, x=coluna_X, y=coluna_y, color='skyblue')
-    plt.title('Ranking de correlação do diagnóstico', fontsize=14)
+    plt.title('Ranking de correlação', fontsize=14)
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plt.show()
 
-    print('\nFinalizando a análise gráfica')
+    print('\nFinalizando a análise gráfica dos dados')
