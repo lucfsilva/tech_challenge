@@ -1,3 +1,4 @@
+import traducao
 import shap
 import pandas as pd
 import numpy as np
@@ -84,17 +85,20 @@ def analisar(modelo, X_treino):
 
     print('\nIniciando avaliação do modelo')
 
+    X_treino_traduzido = traducao.traduzir(X_treino)
+
     # Analisando por "feature importance"
     importances = modelo.feature_importances_
-    pd.Series(importances, index=X_treino.columns).sort_values().plot(kind='barh')
+    pd.Series(importances, index=X_treino_traduzido.columns).sort_values().plot(kind='barh')
     plt.title('Importância das variáveis')
+    plt.tight_layout()
     plt.show()
 
     # Analisando por "SHAP"
-    explainer = shap.Explainer(modelo, X_treino)
-    shap_values = explainer(X_treino)
+    explainer = shap.Explainer(modelo, X_treino_traduzido)
+    shap_values = explainer(X_treino_traduzido)
 
-    shap.summary_plot(shap_values[..., 1], X_treino, plot_type='bar')
-    # shap.summary_plot(shap_values[..., 1], X_treino)
+    shap.summary_plot(shap_values[..., 1], X_treino_traduzido, plot_type='bar')
+    # shap.summary_plot(shap_values[..., 1], X_treino_traduzido)
 
     print('\nFinalizando avaliação do modelo')

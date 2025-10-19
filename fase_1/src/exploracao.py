@@ -1,4 +1,5 @@
 import kagglehub
+import traducao
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -47,15 +48,17 @@ def analise_descritiva(dados: pd.DataFrame):
 
     print('\nIniciando a análise descritiva dos dados')
 
+    dados_traduzidos = traducao.traduzir(dados)
+
     print('\nEstrutura:')
-    print(dados.info())
+    print(dados_traduzidos.info())
 
     # print('\nResumo estatístico:')
     # print(dados.describe())
 
     print('\nZeros inválidos:')
-    dados_invalidos = dados[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']] == 0
-    print((dados_invalidos.sum() / len(dados) * 100).round(2).map(lambda x: f'{x:.2f} %'))
+    dados_invalidos = dados_traduzidos[['Glicose', 'Pressão', 'Espessura da pele', 'Insulina', 'IMC', 'Idade']] == 0
+    print((dados_invalidos.sum() / len(dados_traduzidos) * 100).round(2).map(lambda x: f'{x:.2f} %'))
 
     # print('\nPrimeiras linhas:')
     # print(dados.head())
@@ -76,8 +79,10 @@ def analise_grafica(dados: pd.DataFrame):
 
     print('\nIniciando a análise gráfica dos dados')
 
+    dados_traduzidos = traducao.traduzir(dados)
+
     # Distribuição do diagnóstico
-    contagens = dados['Outcome'].value_counts().sort_index()
+    contagens = dados_traduzidos['Diagnóstico'].value_counts().sort_index()
 
     plt.figure(figsize=(5, 5))
     plt.pie(
@@ -91,7 +96,7 @@ def analise_grafica(dados: pd.DataFrame):
     plt.show()
 
     # Boxplot das características
-    dados_sem_diagnostico = dados.drop('Outcome', axis=1)
+    dados_sem_diagnostico = dados_traduzidos.drop('Diagnóstico', axis=1)
 
     plt.figure(figsize=(10,8))
     plt.suptitle('Características', fontsize=14)
@@ -138,15 +143,16 @@ def analise_grafica(dados: pd.DataFrame):
     # plt.show()
 
     # Mapa de calor entre características e diagnóstico
-    matriz_de_correlacao = dados.corr()
+    matriz_de_correlacao = dados_traduzidos.corr()
 
     plt.figure(figsize=(10,8))
     sns.heatmap(matriz_de_correlacao, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title('Mapa de calor')
+    plt.tight_layout()
     plt.show()
 
     # Ranking da correlação entre características e diagnóstico
-    correlacao = matriz_de_correlacao['Outcome'].drop('Outcome')
+    correlacao = matriz_de_correlacao['Diagnóstico'].drop('Diagnóstico')
     coluna_X = 'Característica'
     coluna_y = 'Correlação'
     ranking = correlacao.abs().sort_values(ascending=False)
