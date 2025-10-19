@@ -3,7 +3,7 @@ import shap
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, recall_score, f1_score, classification_report
+from sklearn.metrics import recall_score, f1_score, precision_score, classification_report
 
 def treinar(modelos, X_treino, y_treino):
     '''
@@ -51,7 +51,7 @@ def avaliar(modelos, X_teste, y_teste):
 
         resultados.append({
             'Modelo': nome,
-            'Accuracy': accuracy_score(y_teste, y_previsto),
+            'Precision': precision_score(y_teste, y_previsto),
             'Recall': recall_score(y_teste, y_previsto),
             'F1-score': f1_score(y_teste, y_previsto),
         })
