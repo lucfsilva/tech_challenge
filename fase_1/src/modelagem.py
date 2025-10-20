@@ -1,9 +1,46 @@
 import traducao
 import shap
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import recall_score, f1_score, precision_score, classification_report
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
+def criar_modelos():
+    '''
+    Gera uma lista de instâncias de modelos para posterior avaliação.
+
+    Retorno:
+        lista de modelos para treino e avaliação
+    '''
+
+    modelos = [
+        LogisticRegression(
+            class_weight='balanced',
+            max_iter=1000,
+            random_state=42
+            ),
+        DecisionTreeClassifier(
+            class_weight='balanced',
+            criterion='entropy',
+            max_depth=4,
+            min_samples_split=10,
+            min_samples_leaf=5,
+            random_state=42),
+        KNeighborsClassifier(
+            n_neighbors=5),
+        RandomForestClassifier(
+            class_weight='balanced',
+            n_estimators=200,
+            random_state=42),
+        GradientBoostingClassifier(
+            n_estimators=200,
+            random_state=42)
+    ]
+
+    return modelos
 
 def treinar(modelos, X_treino, y_treino):
     '''

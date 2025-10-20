@@ -1,10 +1,30 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer, SimpleImputer
+from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
 
-def limpar(dados: pd.DataFrame) -> pd.DataFrame:
+def separar(dados: pd.DataFrame, target: str):
+    '''
+    Aplica padronização nas colunas, para que todas tenham uma escala semelhante.
+
+    Parâmetros:
+        X_treino: dados de treino
+        X_teste: dados de teste
+
+    Retorno:
+        X_treino escalonado
+        X_teste escalonado
+    '''
+    
+    X_dados = dados.drop(columns=[target], axis=1)
+    y_dados = dados[target]
+    X_treino, X_teste, y_treino, y_teste = train_test_split(X_dados, y_dados, test_size=0.2, random_state=42, stratify=y_dados)
+
+    return X_treino, X_teste, y_treino, y_teste
+
+def limpar(X_treino, X_teste: pd.DataFrame) -> pd.DataFrame:
     '''
     Trata as informações que podem prejudicar o treinamento do modelo, como zeros inválidos.
     Foi considerado que as seguintes colunas devem sempre ter um valor maior do que zero:
@@ -24,15 +44,17 @@ def limpar(dados: pd.DataFrame) -> pd.DataFrame:
     print('\nIniciando a limpeza dos dados')
 
     colunas = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']
-    dados[colunas] = dados[colunas].replace(0, np.nan)
+    X_treino[colunas] = X_treino[colunas].replace(0, np.nan)
+    X_teste[colunas] = X_teste[colunas].replace(0, np.nan)
 
     imputer = SimpleImputer(strategy='median')
     # imputer = KNNImputer(n_neighbors=5) # Média e mediana afetaram muito os outliers, mas não parece ter impacto no resultado final
-    dados[colunas] = imputer.fit_transform(dados[colunas])
+    X_treino[colunas] = imputer.fit_transform(X_treino[colunas])
+    X_teste[colunas] = imputer.transform(X_teste[colunas])
 
     print('\nFinalizando a limpeza dos dados')
 
-    return dados
+    return X_treino, X_teste
 
 def padronizar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     '''
