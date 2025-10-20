@@ -3,6 +3,10 @@ import pre_processamento
 import modelagem
 
 def main():
+    '''
+    Início da aplicação.
+    '''
+
     print('\nInício do Tech Challenge - Fase 1: diagnóstico de diabetes')
 
     dados = exploracao.carregar('mathchi/diabetes-data-set')
