@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from sklearn.impute import KNNImputer, SimpleImputer
-from sklearn.preprocessing import StandardScaler
+from sklearn.impute import KNNImputer
+from sklearn.preprocessing import RobustScaler
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 
@@ -47,8 +47,7 @@ def limpar(X_treino, X_teste: pd.DataFrame) -> pd.DataFrame:
     X_treino[colunas] = X_treino[colunas].replace(0, np.nan)
     X_teste[colunas] = X_teste[colunas].replace(0, np.nan)
 
-    imputer = SimpleImputer(strategy='median')
-    # imputer = KNNImputer(n_neighbors=5) # Média e mediana afetaram muito os outliers, mas não parece ter impacto no resultado final
+    imputer = KNNImputer(n_neighbors=5)
     X_treino[colunas] = imputer.fit_transform(X_treino[colunas])
     X_teste[colunas] = imputer.transform(X_teste[colunas])
 
@@ -71,7 +70,7 @@ def padronizar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFr
 
     print('\nIniciando o escalonamento dos dados')
     
-    scaler = StandardScaler()
+    scaler = RobustScaler()
     X_treino_padronizado = scaler.fit_transform(X_treino)
     X_teste_padronizado = scaler.transform(X_teste)
     
