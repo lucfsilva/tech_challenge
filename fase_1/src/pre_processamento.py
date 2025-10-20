@@ -41,7 +41,7 @@ def imputar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> pd.DataFrame:
     Retorno:
         DataFrame com as informações já tratadas
     '''
-    print('\nIniciando a limpeza dos dados')
+    print('\nIniciando a imputação dos dados')
 
     colunas = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'Age']
     X_treino[colunas] = X_treino[colunas].replace(0, np.nan)
@@ -51,7 +51,7 @@ def imputar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> pd.DataFrame:
     X_treino[colunas] = imputer.fit_transform(X_treino[colunas])
     X_teste[colunas] = imputer.transform(X_teste[colunas])
 
-    print('\nFinalizando a limpeza dos dados')
+    print('\nFinalizando a imputação dos dados')
 
     return X_treino, X_teste
 
