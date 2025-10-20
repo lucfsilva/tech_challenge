@@ -24,7 +24,7 @@ def separar(dados: pd.DataFrame, target: str):
 
     return X_treino, X_teste, y_treino, y_teste
 
-def limpar(X_treino, X_teste: pd.DataFrame) -> pd.DataFrame:
+def imputar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> pd.DataFrame:
     '''
     Trata as informações que podem prejudicar o treinamento do modelo, como zeros inválidos.
     Foi considerado que as seguintes colunas devem sempre ter um valor maior do que zero:
