@@ -55,6 +55,27 @@ def imputar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> pd.DataFrame:
 
     return X_treino, X_teste
 
+def balancear(X_treino: pd.DataFrame, y_treino: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    '''
+    Equilibra a quantidade de dados por diagóstico
+
+    Parâmetros:
+        X_treino: características de treino
+        y_treino: diagnósticos de treino
+
+    Retorno:
+        X_treino balanceado
+        y_treino balanceado
+    '''
+
+    print('\nIniciando o balanceamento dos dados')
+
+    X_treino_balanceado, y_treino_balanceado = SMOTE().fit_resample(X_treino, y_treino)
+
+    print('\nFinalizando o balanceamento dos dados')
+
+    return X_treino_balanceado, y_treino_balanceado
+
 def padronizar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     '''
     Aplica padronização nas colunas, para que todas tenham uma escala semelhante.
@@ -74,28 +95,9 @@ def padronizar(X_treino: pd.DataFrame, X_teste: pd.DataFrame) -> tuple[pd.DataFr
     X_treino_padronizado = scaler.fit_transform(X_treino)
     X_teste_padronizado = scaler.transform(X_teste)
     
-    X_treino_padronizado_df = pd.DataFrame(X_treino_padronizado, columns=X_treino.columns)
-    X_teste_padronizado_df = pd.DataFrame(X_teste_padronizado, columns=X_teste.columns)
+    X_treino_padronizado = pd.DataFrame(X_treino_padronizado, columns=X_treino.columns)
+    X_teste_padronizado = pd.DataFrame(X_teste_padronizado, columns=X_teste.columns)
 
     print('\nFinalizando o escalonamento dos dados')
 
-    return X_treino_padronizado_df, X_teste_padronizado_df
-
-def balancear(X_treino: pd.DataFrame, y_treino: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    '''
-    Equilibra a quantidade de dados por diagóstico
-
-    Parâmetros:
-        X_treino: características de treino
-        y_treino: diagnósticos de treino
-
-    Retorno:
-        X_treino balanceado
-        y_treino balanceado
-    '''
-
-    print('\nIniciando o balanceamento dos dados')
-    X_treino_balanceado, y_treino_balanceado = SMOTE().fit_resample(X_treino, y_treino)
-    print('\nFinalizando o balanceamento dos dados')
-
-    return X_treino_balanceado, y_treino_balanceado    
+    return X_treino_padronizado, X_teste_padronizado

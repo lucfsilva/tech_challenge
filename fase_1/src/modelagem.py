@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import recall_score, f1_score, precision_score, classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
 def criar_modelos():
@@ -30,13 +30,14 @@ def criar_modelos():
             min_samples_leaf=5,
             random_state=42),
         KNeighborsClassifier(
-            n_neighbors=5),
+            n_neighbors=5,
+            weights='distance'),
         RandomForestClassifier(
             class_weight='balanced',
             n_estimators=200,
-            random_state=42),
-        GradientBoostingClassifier(
-            n_estimators=200,
+            random_state=42),            
+        HistGradientBoostingClassifier(
+            class_weight='balanced',
             random_state=42)
     ]
 
