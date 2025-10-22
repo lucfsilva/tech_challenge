@@ -60,8 +60,8 @@ def analise_descritiva(dados: pd.DataFrame):
     dados_invalidos = dados_traduzidos[['Glicose', 'Pressão', 'Espessura da pele', 'Insulina', 'IMC', 'Idade']] <= 0
     print((dados_invalidos.sum() / len(dados_traduzidos) * 100).round(2).map(lambda x: f'{x:.2f} %'))
 
-    # print('\nPrimeiras linhas:')
-    # print(dados.head())
+    print('\nPrimeiras linhas:')
+    print(dados_traduzidos.head())
 
     print('\nFinalizando a análise descritiva dos dados')
 
